@@ -1,42 +1,40 @@
 ---
 name: driftwave
-description: Full Driftwave v2.0 MaxOp semantic dimensionalizer with isomorphic encoding support and round-trip verification.
-version: 2.0-maxop-isomorphic
-triggers: ["/driftwave", "driftwave", "dimensionalize", "maxop"]
+description: Full Driftwave v2.1 MaxOp semantic dimensionalizer with explicit (State, Activity) ontology, semantic shape diffing, isomorphic encoding (language ↔ code), and mandatory round-trip verification.
+version: 2.1-maxop-isomorphic
+triggers: ["/driftwave", "driftwave", "dimensionalize", "maxop", "verify-roundtrip"]
 ---
 
-# Driftwave v2.0 MaxOp Skill – Isomorphic Round-Trip Verified
+# Driftwave v2.1 MaxOp – Isomorphic & Self-Verifying
 
-**Command**: `/driftwave <your task or content>`
+**Core Ontology Principle**
+Every operation consists of explicit, labeled (State, Activity) pairs. Language and code are isomorphic encodings of the same underlying operations. The Target Semantic Shape is the single source of truth. All conversions are subject to mandatory round-trip verification to eliminate black-box behavior.
 
-**Core Ontology (Operational)**:
-Every operation is handled through explicit (State, Activity) pairs. Language and code are isomorphic encodings of the same operations. The semantic shape is the single source of truth. Round-trip verification is mandatory on all conversions.
+## Execution Flow (Operational)
 
-## Round-Trip Verifier (Fully Implemented)
+1. **Qualify** – Lock in exact value and success criteria
+2. **Capture State** – Full snapshot of current system
+3. **Dimensionalize** – Build Target Semantic Shape
+4. **Compute Diff** – Semantic shape diff between current and target
+5. **Generate Work Order** – Ordered (State → Activity → New State) transitions
+6. **Execute + Verify** – Run with sub-agents, round-trip verification, and recursion on failure
+7. **Final Alignment** – Only return output when diff is within tolerance
+
+## Round-Trip Verifier (Mandatory)
 
 ```yaml
 round_trip_verifier:
-  id: "mechanism-03-round-trip"
-  version: "2.0-maxop-isomorphic"
-  description: "Mandatory lossless verification between language ↔ neutral ↔ code"
-  execution_sequence:
-    - step: "RT-01-convert-to-neutral"
-      activity: "Convert input to neutral (State, Activity) semantic shape"
-    - step: "RT-02-re-encode-to-original"
-      activity: "Convert neutral shape back to original encoding"
-    - step: "RT-03-compute-drift"
-      activity: "Calculate structural + semantic drift score"
-      tolerance_threshold: 0.95
-    - step: "RT-04-gate-and-recurse"
-      activity: "If drift_score < 0.95 → trigger recursion on failing pairs"
-  invocation_points:
-    - "After every major conversion"
-    - "Before final output"
+  version: 2.1
+  tolerance: 0.95
+  execution:
+    - RT-01: Convert input → Neutral Semantic Shape
+    - RT-02: Neutral → Original encoding
+    - RT-03: Compute structural + semantic drift score
+    - RT-04: If drift_score < 0.95 → recurse on failing (State, Activity) pairs
+  invocation: "Automatic after every conversion and before final deliverables"
 ```
 
-This skill now enforces full semantic shape diffing, state-activity explicitness, and round-trip verification on every run.
+**Usage**: `/driftwave <your request>`
+The skill automatically runs the full ontology with round-trip verification and self-correction.
 
-**Usage**:
-Just type `/driftwave` followed by your request. The full optimized ontology (with round-trip verification) will run automatically.
-
-The system is now self-correcting and black-box-free.
+This implementation enforces discrete, auditable state-activity transitions across all encodings.
